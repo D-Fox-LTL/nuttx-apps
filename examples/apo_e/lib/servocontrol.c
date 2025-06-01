@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 
-#define SERVO_DEV "/dev/pwm2"     // PWM device for LEDC channel 2 (GPIO17)
+#define SERVO_DEV "/dev/pwm2"     // PWM device for LEDC channel 2 (GPIO21)
 #define SERVO_FREQ 50             // Standard 50 Hz for servo
 
 static int servo_fd = -1;
