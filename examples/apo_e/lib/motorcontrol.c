@@ -15,11 +15,12 @@
 #define BIN2_GPIO 3
 
 /* PWM LEDC Channels → GPIO6 (CH0), GPIO7 (CH1) */
-#define MOTOR_LEFT_PWM_CHANNEL  0
-#define MOTOR_RIGHT_PWM_CHANNEL 1
+#define MOTOR_LEFT_MCPWM_CHANNEL  0
+#define MOTOR_RIGHT_MCPWM_CHANNEL 1
 
 /* PWM Device */
-#define MOTOR_PWM_DEV "/dev/pwm0"
+#define MOTOR_PWM_DEV0 "/dev/motor0"
+#define MOTOR_PWM_DEV1 "/dev/motor1"
 
 static int pwm_fd = -1;
 
@@ -29,7 +30,7 @@ void board_gpio_config_output(int pin, bool value) {
     snprintf(devname, sizeof(devname), "/dev/gpio%d", pin);
     int fd = open(devname, O_RDWR);
     if (fd >= 0) {
-        // We just write to it — assume already configured as output
+        // Assume already configured as output
         ioctl(fd, GPIOC_WRITE, (unsigned long)value);
         close(fd);
     } else {
@@ -67,7 +68,7 @@ void motor_init(void)
 static void motor_pwm(uint16_t left_duty, uint16_t right_duty)
 {
   struct pwm_info_s info;
-  info.frequency = 1000; // 1kHz, safe default for TB6612FNG
+  info.frequency = 1000; // 1kHz
 
 #ifdef CONFIG_PWM_MULTICHAN
   info.channels[0].channel = MOTOR_LEFT_PWM_CHANNEL;
