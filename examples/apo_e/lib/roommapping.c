@@ -1,11 +1,11 @@
 /* mapping.c */
 #include <stdio.h>
-#include <math.h>
 #include <string.h>
 #include <unistd.h>
 
+#define PI 3.14159265358979323846
 #define MAX_SCAN 36
-#define DEG2RAD(deg) ((deg) * M_PI / 180.0)
+#define DEG2RAD(deg) ((deg) * PI / 180.0)
 
 static int scan_angles[MAX_SCAN];
 static int scan_dists[MAX_SCAN];
