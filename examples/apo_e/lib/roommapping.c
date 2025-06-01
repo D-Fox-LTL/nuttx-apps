@@ -4,9 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#define PI 3.14159265358979323
 #define MAX_SCAN 36
-#define DEG2RAD(deg) ((deg) * PI / 180.0)
+#define DEG2RAD(deg) ((deg) * M_PI / 180.0)
 
 static int scan_angles[MAX_SCAN];
 static int scan_dists[MAX_SCAN];
@@ -19,6 +18,7 @@ void mapping_init(void)
     memset(scan_dists, 0, sizeof(scan_dists));
 }
 
+/* Used for storing mapped area */
 void mapping_store(int angle, int dist)
 {
     if (scan_count < MAX_SCAN) {
@@ -28,6 +28,7 @@ void mapping_store(int angle, int dist)
     }
 }
 
+/*  Gets distance from scanned area */
 int mapping_get_distance(int angle)
 {
     for (int i = 0; i < scan_count; i++) {
@@ -37,6 +38,7 @@ int mapping_get_distance(int angle)
     return -1;
 }
 
+/* Mainly debug function*/
 void mapping_dump(void)
 {
     for (int i = 0; i < scan_count; i++) {
@@ -44,6 +46,7 @@ void mapping_dump(void)
     }
 }
 
+/* After mapping convert to cartesian */
 void mapping_get_cartesian(int index, float *x, float *y)
 {
     if (index >= scan_count || index < 0) {
@@ -57,6 +60,7 @@ void mapping_get_cartesian(int index, float *x, float *y)
     *y = scan_dists[index] * sinf(angle_rad);
 }
 
+/* Send body to webserver */
 void http_send(int connfd, const char *body) {
     char header[256];
     int body_len = strlen(body);
@@ -76,7 +80,7 @@ void http_send(int connfd, const char *body) {
     write(connfd, body, body_len);
 }
 
-
+/* Handles scan and sends it with http_send*/
 void handle_scan(int connfd)
 {
     char buf[1024];

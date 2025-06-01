@@ -45,7 +45,7 @@ void servocontrol_set_angle(int angle)
   pwm.frequency = SERVO_FREQ;
 
 #ifdef CONFIG_PWM_MULTICHAN
-  pwm.channels[0].channel = 2;   // Same as init!
+  pwm.channels[0].channel = 2;   // Same as init
   pwm.channels[0].duty = duty;
 #endif
 

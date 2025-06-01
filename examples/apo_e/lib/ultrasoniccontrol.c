@@ -9,18 +9,18 @@
 #include <nuttx/board.h>
 
 
-#define TRIG_GPIO 0  // GPIO0
-#define ECHO_GPIO 1  // GPIO1
+#define TRIG_GPIO 1  // GPIO1
+#define ECHO_GPIO 0  // GPIO0
 #ifndef GPIOC_SETDIR
 #  define GPIOC_SETDIR  _GPIOC(0x0003)
 #endif
 
 #ifndef GPIO_DIR_OUT
-#  define GPIO_DIR_OUT  1
+#  define GPIO_DIR_OUT  0
 #endif
 
 #ifndef GPIO_DIR_IN
-#  define GPIO_DIR_IN   0
+#  define GPIO_DIR_IN   1
 #endif
 
 
@@ -36,8 +36,8 @@ static uint64_t micros(void)
 
 void ultrasonic_init(void)
 {
-    trig_fd = open("/dev/gpio0", O_RDWR);
-    echo_fd = open("/dev/gpio1", O_RDONLY);
+    trig_fd = open("/dev/gpio1", O_RDWR);
+    echo_fd = open("/dev/gpio0", O_RDONLY);
     if (trig_fd < 0 || echo_fd < 0) {
         printf("Failed to open GPIOs\n");
         return;
@@ -49,17 +49,16 @@ void ultrasonic_init(void)
 }
 
 
-
 int ultrasonic_get_distance(void)
 {
     // Send 10us trigger pulse
     ioctl(trig_fd, GPIOC_WRITE, 0); // Low
-    usleep(2);                      // Wait a bit
+    usleep(2);                      // Wait
     ioctl(trig_fd, GPIOC_WRITE, 1); // High
-    usleep(10);                     // 10 us pulse
+    usleep(10);                     // Wait
     ioctl(trig_fd, GPIOC_WRITE, 0); // Low again
 
-    // Wait for echo to go HIGH
+    // Wait for echo to go high
     uint64_t timeout = micros() + 20000; // 20ms timeout
     while (1) {
         int value;
