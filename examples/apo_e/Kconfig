@@ -1,0 +1,29 @@
+#
+# For a description of the syntax of this configuration file,
+# see the file kconfig-language.txt in the NuttX tools repository.
+#
+
+config EXAMPLES_APO_E
+	tristate "APO-E self driving radar car"
+	default n
+	---help---
+		Enable the \"Hello, World!\" example
+
+if EXAMPLES_APO_E
+
+config EXAMPLES_APO_E_PROGNAME
+	string "Program name"
+	default "apoe"
+	---help---
+		This is the name of the program that will be used when the NSH ELF
+		program is installed.
+
+config EXAMPLES_APO_E_PRIORITY
+	int "APO-E task priority"
+	default 100
+
+config EXAMPLES_APO_E_STACKSIZE
+	int "APO-E stack size"
+	default DEFAULT_TASK_STACKSIZE
+
+endif
