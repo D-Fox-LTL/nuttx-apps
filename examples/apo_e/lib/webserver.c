@@ -2,11 +2,10 @@
 #include "motorcontrol.h"
 #include "servocontrol.h"
 #include "roommapping.h"
-#include <netutils/httpd.h>
-#include <netutils/httpd_cgi.h>
-//#include <../../netutils/webserver/httpd_cgi.h>
+#include "netutils/httpd.h"
+#include "netutils/httpd_cgi.h"
 #ifdef CONFIG_EXAMPLES_WEBSERVER_DHCPC
-#include <arpa/inet.h>
+#include "arpa/inet.h"
 #endif
 #ifdef CONFIG_EXAMPLES_WEBSERVER_DHCPC
 #  include "netutils/dhcpc.h"
@@ -24,8 +23,6 @@ static bool auto_mode = false;
 static time_t last_user_ping = 0;
 
 #define USER_TIMEOUT_SEC 10
-
-int cmd_handler(const char *uri, char *params, char *post_data, int content_len, int sock);
 
 static const struct httpd_cgi_call cmd_cgis[] = {
   { "/fwd",  cmd_handler },
@@ -61,11 +58,13 @@ bool webserver_is_auto_mode(void)
   return auto_mode;
 }
 
-static int cmd_handler(const char *uri, char *params, char *post_data,
-                       int content_len, int sock)
+/* Handle commands from user given to webserver */
+static int cmd_handler(const char *uri, char *params, char *post_data, int content_len, int sock)
 {
   update_user_ping();
 
+  //for now too many if-else commands
+  //TODO: change it into something more computer friendly
   if (strcmp(uri, "/fwd") == 0) {
     motor_forward();
     return httpd_cgi_success(sock);
