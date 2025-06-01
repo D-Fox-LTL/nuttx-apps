@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>RadarCar Control Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+    }
+    h2 {
+      color: #333;
+    }
+    #controls {
+      margin: 20px;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #radarCanvas {
+      background: #eef;
+      border: 2px solid #333;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>RadarCar Control Panel</h2>
+
+  <canvas id="radarCanvas" width="300" height="300"></canvas>
+
+  <div id="controls">
+    <button onclick="sendCmd('fwd')">Forward</button><br>
+    <button onclick="sendCmd('left')">Left</button>
+    <button onclick="sendCmd('stop')">Stop</button>
+    <button onclick="sendCmd('right')">Right</button><br>
+    <button onclick="sendCmd('rev')">Reverse</button><br>
+    <button onclick="toggleAuto()">Auto/Manual</button>
+  </div>
+
+<script>
+let autoMode = false;
+
+function sendCmd(cmd) {
+  fetch('/' + cmd)
+    .then(() => console.log("Sent:", cmd));
+}
+
+function toggleAuto() {
+  autoMode = !autoMode;
+  fetch('/auto?' + (autoMode ? 'on' : 'off'))
+    .then(() => console.log("Auto mode:", autoMode));
+}
+
+// Periodically scan and draw radar if in auto mode
+setInterval(() => {
+  if (autoMode) scanAndDraw();
+}, 1000);
+
+function scanAndDraw() {
+  fetch('/scan')
+    .then(response => response.json())
+    .then(data => drawRadar(data));
+}
+
+function drawRadar(points) {
+  const canvas = document.getElementById('radarCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height;
+  const maxRadius = cy - 20;
+
+  // Draw car at center-bottom
+  ctx.fillStyle = 'black';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
+  ctx.fill();
+
+  // Draw radar points
+  ctx.strokeStyle = 'red';
+  points.forEach(p => {
+    const angle = Math.PI * (p.angle / 180);
+    const dist = Math.min(p.dist, 100); // clamp
+    const r = (dist / 100) * maxRadius;
+    const x = cx + r * Math.sin(angle);
+    const y = cy - r * Math.cos(angle);
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  });
+}
+</script>
+
+</body>
+</html>
